@@ -26,7 +26,8 @@ Executable mancala
     -fno-warn-orphans
   build-depends:
     base                 >= 4    && < 5,
-    containers           >= 0.4  && < 0.6,
+    array                >= 0.4  && < 0.5,
+    containers           >= 0.5  && < 0.6,
     text                 >= 0.11 && < 0.12,
     mtl                  >= 2.1  && < 2.2
   default-extensions:
@@ -38,6 +39,7 @@ Executable mancala
     LambdaCase
     OverloadedStrings
     ViewPatterns
+    RecordWildCards
   other-extensions:
     TemplateHaskell
 
