@@ -2,7 +2,7 @@
 module Main where
 
 import Control.Monad
-import Data.Array ((!))
+import Data.Array ((!), (//))
 import qualified Data.Array as A
 import qualified Data.Set as S
 
@@ -68,8 +68,31 @@ move g m | not $ legalMove g m = Nothing
 move g (Move p i) =
   fmap (g',) . maybe (Just . NextTurn $ p') (Just . Victory) . victor $ g'
   where
-    (g', freeTurn) = undefined g p i
+    (g', i') = rawMove g p i
+    freeTurn = isFreeTurnBin g' p i'
     p' = if freeTurn then p else opponent p
+
+isFreeTurnBin :: Game -> Player -> BinIndex -> Bool
+isFreeTurnBin g p i = binType == Mancala && binPlayer == p
+  where
+    Bin{..} = g ! cycSucc i
+
+cycSucc :: (Eq a, Enum a, Bounded a) => a -> a
+cycSucc x = if x == maxBound then minBound else succ x
+
+rawMove :: Game -> Player -> BinIndex -> (Game, BinIndex)
+rawMove g p i = uncurry (capture p) . sow g' (cycSucc i) $ ss
+  where
+    fromBin = g ! i
+    ss = binStones fromBin
+    fromBin' = fromBin { binStones = S.empty }
+    g' = g // [(i, fromBin')]
+
+sow :: Game -> BinIndex -> Stones -> (Game, BinIndex)
+sow = undefined
+
+capture :: Player -> Game -> BinIndex -> (Game, BinIndex)
+capture = undefined
 
 main :: IO ()
 main = undefined move
