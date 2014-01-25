@@ -89,10 +89,37 @@ rawMove g p i = uncurry (capture p) . sow g' (cycSucc i) $ ss
     g' = g // [(i, fromBin')]
 
 sow :: Game -> BinIndex -> Stones -> (Game, BinIndex)
-sow = undefined
+sow g i stones = (g // updates, lastBinIndexUpdated)
+  where
+    -- TODO skip the opponent's mancala
+    stoneIndices = zip (iterate cycSucc i) (S.toList stones)
+    binsToUpdate = map ((g !) . fst) stoneIndices
+    updates = zipWith f stoneIndices binsToUpdate
+    f (i, s) bin = (i, bin { binStones = S.insert s (binStones bin) })
+    lastBinIndexUpdated = fst . last $ stoneIndices
+
+canCaptureFromBins :: Player -> Bin -> Bin -> Bool
+canCaptureFromBins p x y =
+  binType x == PlainBin
+  && binPlayer x == p
+  && S.size (binStones x) == 1
+  && binStones y /= S.empty
 
 capture :: Player -> Game -> BinIndex -> (Game, BinIndex)
-capture = undefined
+capture p g i =
+  if canCaptureFromBins p playerBin opponentBin
+  then moveAllStones j m . moveAllStones i m $ g
+  where
+    x = g ! i
+    j = oppositeBinIndex i
+    y = g ! j
+    m = findMancala p
+
+moveAllStones :: BinIndex -> BinIndex -> Game -> Game
+moveAllStones = undefined
+
+findMancala :: Player -> BinIndex
+findMancala = undefined
 
 main :: IO ()
 main = undefined move
